@@ -30,3 +30,31 @@ def create_task(request):
         'data': serializer.errors,
     }
     return Response(response_data)
+
+
+@api_view(['POST'])
+def update_task(request,pk):
+    if Task.objects.filter(pk=pk):
+        instance = Task.objects.get(pk=pk)
+        serializer = TaskSerializers(instance=instance,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data = {
+                'status_code': 6000,
+                'message': 'Task updated successfully',
+                'data': serializer.data,
+            }
+            return Response(response_data)
+
+        response_data = {
+            'status_code': 6001,
+            'message': 'Task updation is failed',
+            'data': serializer.errors,
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'status_code': 6001,
+            'message': 'Task not exist',
+        }
+        return Response(response_data)
